@@ -1,4 +1,4 @@
-name: node-exporter
+name: prometheus-node-exporter
 summary: Prometheus Node Exporter
 maintainer: Canonical Landscape Team <landscape-crew@lists.canonical.com>
 description: |

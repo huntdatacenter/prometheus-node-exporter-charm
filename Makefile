@@ -1,6 +1,6 @@
-CHARM_NAME = node-exporter
+CHARM_NAME = prometheus-node-exporter
 CHARM_SERIES = xenial
-CHARM_OUTPUT = ../node-exporter-charm-output
+CHARM_OUTPUT = ../prometheus-node-exporter-charm-output
 
 
 .PHONY: help

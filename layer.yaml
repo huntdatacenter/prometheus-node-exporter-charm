@@ -2,7 +2,7 @@ includes:
   - layer:basic
   - layer:snap
   - interface:http
-repo: https://github.com/bjornt/node-exporter-charm
+repo: https://github.com/bjornt/prometheus-node-exporter-charm
 options:
   basic:
     use_venv: true
