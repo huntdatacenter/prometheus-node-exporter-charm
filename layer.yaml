@@ -1,0 +1,15 @@
+includes:
+  - layer:basic
+  - layer:snap
+  - interface:http
+repo: https://github.com/bjornt/node-exporter-charm
+options:
+  basic:
+    use_venv: true
+  snap:
+    bjornt-prometheus-node-exporter:
+      channel: stable
+      devmode: false
+      jailmode: false
+      force_dangerous: false
+      revision: null

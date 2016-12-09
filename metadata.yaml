@@ -1,0 +1,17 @@
+name: node-exporter
+summary: Prometheus Node Exporter
+maintainer: Canonical Landscape Team <landscape-crew@lists.canonical.com>
+description: |
+    Prometheus Node Exporter
+subordinate: true
+series:
+  - xenial
+tags:
+  - prometheus
+provides:
+  prometheus-client:
+    interface: http
+requires:
+  container:
+    interface: juju-info
+    scope: container
