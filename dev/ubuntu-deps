@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+PACKAGES="\
+    python3-venv
+"
+
+sudo apt update
+sudo apt install -y $PACKAGES

@@ -1,0 +1,5 @@
+flake8
+charmhelpers
+coverage
+charms.reactive
+charm-test
