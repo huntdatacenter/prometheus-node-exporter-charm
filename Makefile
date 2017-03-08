@@ -24,7 +24,7 @@ charm-build:  ## Build the charm
 $(CHARM_OUTPUT_DIR): layer.yaml metadata.yaml
 	$(MAKE) charm-build
 
-$(VIRT_ENV): $(REQUIREMENTS_TXT)
+$(VIRT_ENV):
 	./dev/ubuntu-deps
 	python3 -m venv $(VIRT_ENV)
 	pip install -r $(REQUIREMENTS_TXT)
