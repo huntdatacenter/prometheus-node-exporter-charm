@@ -1,0 +1,27 @@
+#!/usr/bin/python3
+import os
+
+
+def main():
+    current = os.getcwd()
+    charm_dir = os.environ["CHARM_OUTPUT_DIR"]
+    for sub_dir in ["reactive", "unit_tests"]:
+        sub_dir_path = os.path.join(charm_dir, sub_dir)
+        for dirpath, dirnames, filenames in os.walk(sub_dir_path):
+            dir_rel_path = os.path.relpath(dirpath, charm_dir)
+            for filename in filenames:
+                file_rel_path = os.path.join(dir_rel_path, filename)
+                file_charm_path = os.path.join(charm_dir, file_rel_path)
+                file_current_path = os.path.join(current, file_rel_path)
+                if not os.path.exists(file_current_path):
+                    continue
+                if os.path.islink(file_charm_path):
+                    print("{} is already a symlink".format(file_rel_path))
+                    continue
+                print("Symlinking {}...".format(file_rel_path))
+                os.remove(file_charm_path)
+                os.symlink(os.path.abspath(file_current_path), file_charm_path)
+
+
+if __name__ == "__main__":
+    main()

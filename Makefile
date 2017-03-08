@@ -1,6 +1,7 @@
 CHARM_NAME = prometheus-node-exporter
 CHARM_SERIES = xenial
-CHARM_OUTPUT = output
+BUILD_DIR = output
+export CHARM_OUTPUT_DIR = $(BUILD_DIR)/$(CHARM_SERIES)/$(CHARM_NAME)
 
 VIRT_ENV = $(PWD)/.ve
 REQUIREMENTS_TXT = requirements.txt
@@ -21,10 +22,11 @@ deps:  ## Install the dependencies
 
 .PHONY: charm-build
 charm-build:  ## Build the charm
-	rm -rf $(CHARM_OUTPUT)
-	INTERFACE_PATH=interfaces charm build -s $(CHARM_SERIES) -o $(CHARM_OUTPUT)
+	rm -rf $(BUILD_DIR)
+	INTERFACE_PATH=interfaces charm build -s $(CHARM_SERIES) -o $(BUILD_DIR)
+	rm -rf $(CHARM_OUTPUT_DIR)/$(BUILD_DIR)
 
-$(CHARM_OUTPUT)/$(CHARM_SERIES)/$(CHARM_NAME):
+$(CHARM_OUTPUT_DIR):
 	$(MAKE) charm-build
 
 $(VIRT_ENV): deps
@@ -32,11 +34,14 @@ $(VIRT_ENV): deps
 	pip install -r $(REQUIREMENTS_TXT)
 
 .PHONY: test
-test: CHARM_DIR=$(CHARM_OUTPUT)/$(CHARM_SERIES)/$(CHARM_NAME)
 test:
-	touch $(CHARM_DIR)/lib/charms/layer/__init__.py
-	ln -sf $(PWD)/$(CHARM_DIR)/lib/charms/layer/ $(VIRT_ENV)/lib/python3.5/site-packages/charms/layer
-	cd $(CHARM_DIR) && $(VIRT_ENV)/bin/python3 -m unittest discover unit_tests
+	touch $(CHARM_OUTPUT_DIR)/lib/charms/layer/__init__.py
+	ln -sf $(PWD)/$(CHARM_OUTPUT_DIR)/lib/charms/layer/ $(VIRT_ENV)/lib/python3.5/site-packages/charms/layer
+	cd $(CHARM_OUTPUT_DIR) && $(VIRT_ENV)/bin/python3 -m unittest discover unit_tests
+
+.PHONY: develop
+develop:
+	dev/develop
 
 
 .DEFAULT_GOAL := help
