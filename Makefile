@@ -3,7 +3,7 @@ CHARM_SERIES = xenial
 BUILD_DIR = output
 export CHARM_OUTPUT_DIR = $(BUILD_DIR)/$(CHARM_SERIES)/$(CHARM_NAME)
 
-VIRT_ENV = $(PWD)/.ve
+VIRT_ENV = .ve
 REQUIREMENTS_TXT = requirements.txt
 export PATH := $(VIRT_ENV)/bin:$(PATH)
 
@@ -13,12 +13,7 @@ help: ## Print help about available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: build
-build: $(VIRT_ENV) ## Install build dependencies and build the charm
-	$(MAKE) charm-build
-
-.PHONY: deps
-deps:  ## Install the dependencies
-	./dev/ubuntu-deps
+build: $(VIRT_ENV)  ## Install build dependencies
 
 .PHONY: charm-build
 charm-build:  ## Build the charm
@@ -26,22 +21,23 @@ charm-build:  ## Build the charm
 	INTERFACE_PATH=interfaces charm build -s $(CHARM_SERIES) -o $(BUILD_DIR)
 	rm -rf $(CHARM_OUTPUT_DIR)/$(BUILD_DIR)
 
-$(CHARM_OUTPUT_DIR):
+$(CHARM_OUTPUT_DIR): layer.yaml metadata.yaml
 	$(MAKE) charm-build
 
-$(VIRT_ENV): deps
+$(VIRT_ENV): $(REQUIREMENTS_TXT)
+	./dev/ubuntu-deps
 	python3 -m venv $(VIRT_ENV)
 	pip install -r $(REQUIREMENTS_TXT)
 
 .PHONY: test
-test:
+test: build develop
 	touch $(CHARM_OUTPUT_DIR)/lib/charms/layer/__init__.py
 	ln -sf $(PWD)/$(CHARM_OUTPUT_DIR)/lib/charms/layer/ $(VIRT_ENV)/lib/python3.5/site-packages/charms/layer
-	cd $(CHARM_OUTPUT_DIR) && $(VIRT_ENV)/bin/python3 -m unittest discover unit_tests
+	cd $(CHARM_OUTPUT_DIR) && $(PWD)/$(VIRT_ENV)/bin/python3 -m unittest discover unit_tests
 
 .PHONY: develop
-develop:
+develop: $(CHARM_OUTPUT_DIR)
 	dev/develop
 
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := build
