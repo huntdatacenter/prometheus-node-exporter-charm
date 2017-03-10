@@ -13,10 +13,6 @@ def prometheus_client(prometheus):
 
 def get_principal_unit():
     '''Return the principal unit for this subordinate.'''
-    relation_ids = hookenv.relation_ids('container')
-    if not relation_ids:
-        return
-
-    relations = hookenv.relations_for_id(relation_ids[0])
-    if relations:
-        return relations[0]['__unit__']
+    for relation_id in hookenv.relation_ids('container'):
+        for relation_data in hookenv.relations_for_id(relation_id):
+            return relation_data['__unit__']
