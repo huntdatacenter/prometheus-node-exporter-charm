@@ -1,0 +1,6 @@
+"options":
+  "port":
+    "type": "int"
+    "default": !!int "9100"
+    "description": |
+      port to run metrics target on
