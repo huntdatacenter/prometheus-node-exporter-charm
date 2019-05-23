@@ -1,15 +1,11 @@
-includes:
-  - layer:basic
-  - layer:snap
-  - interface:http
-repo: https://github.com/bjornt/prometheus-node-exporter-charm
-options:
-  basic:
-    use_venv: true
-  snap:
-    bjornt-prometheus-node-exporter:
-      channel: stable
-      devmode: false
-      jailmode: false
-      force_dangerous: false
-      revision: null
+"options":
+  "prometheus-node-exporter": {}
+  "basic":
+    "use_venv": !!bool "false"
+    "packages": []
+    "include_system_packages": !!bool "false"
+"includes":
+- "layer:basic"
+- "interface:prometheus"
+"repo": "https://github.com/talentiq/charms"
+"is": "prometheus-node-exporter"

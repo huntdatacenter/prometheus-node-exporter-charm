@@ -1,17 +1,22 @@
-name: prometheus-node-exporter
-summary: Prometheus Node Exporter
-maintainer: Canonical Landscape Team <landscape-crew@lists.canonical.com>
-description: |
-    Prometheus Node Exporter
-subordinate: true
-series:
-  - xenial
-tags:
-  - prometheus
-provides:
-  prometheus-client:
-    interface: http
-requires:
-  container:
-    interface: juju-info
-    scope: container
+"name": "prometheus-node-exporter"
+"summary": "Prometheus node exporter component"
+"maintainer": "James Beedy <jamesbeedy@gmail.com>"
+"description": |
+  This layer provides the prometheus "node_exporter"
+"tags":
+- "prometheus"
+"series":
+- "xenial"
+"requires":
+  "juju-info":
+    "interface": "juju-info"
+    "scope": "container"
+"provides":
+  "scrape":
+    "interface": "prometheus"
+"resources":
+  "node-exporter":
+    "type": "file"
+    "filename": "node_exporter"
+    "description": "Prometheus Node Exporter"
+"subordinate": !!bool "true"
