@@ -1,6 +1,46 @@
 "options":
+  "host":
+    "type": "string"
+    "default": !!str "0.0.0.0"
+    "description": |
+      IP to run metrics target on
   "port":
     "type": "int"
     "default": !!int "9100"
     "description": |
       port to run metrics target on
+  "ntp-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable NTP collector.
+  "nfs-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable NFS collector.
+  "supervisord-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable supervisord collector.
+  "systemd-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable systemd collector.
+  "mountstats-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable mountstats collector.
+  "interrupts-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable interrupts collector.
+  "bonding-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable bonding collector.

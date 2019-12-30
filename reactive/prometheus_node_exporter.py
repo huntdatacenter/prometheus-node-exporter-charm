@@ -19,17 +19,38 @@ from charmhelpers.core.hookenv import (
     log,
 )
 from charmhelpers.core.templating import render
-
+from charmhelpers.core.host import (
+    mkdir,
+    group_exists,
+    add_group,
+    user_exists,
+    adduser,
+)
 from charms.layer.prometheus_node_exporter import (
     start_restart,
     NODE_EXPORTER_BIN,
     NODE_EXPORTER_SERVICE,
+    NODE_EXPORTER_DEFAULT,
 )
 
 
 @when_not('prometheus.node.exporter.bin.available')
 def install_prometheus_exporter_resource():
-    go_bin = resource_get('node-exporter')
+    go_bin = resource_get('prometheus-node-exporter')
+    if not group_exists('prometheus'):
+        add_group('prometheus', system_group=True)
+    if not user_exists('prometheus'):
+        adduser(
+            'prometheus',
+            shell='/bin/false',
+            system_user=True,
+            primary_group='prometheus',
+            home_dir='/var/lib/prometheus',
+        )
+    if not os.path.exists('/var/lib/prometheus'):
+        mkdir('/var/lib/prometheus', owner='prometheus')
+    if not os.path.exists('/var/lib/prometheus/node-exporter'):
+        mkdir('/var/lib/prometheus/node-exporter', owner='prometheus')
     if os.path.exists(NODE_EXPORTER_BIN):
         os.remove(NODE_EXPORTER_BIN)
     copyfile(go_bin, NODE_EXPORTER_BIN)
@@ -42,8 +63,29 @@ def install_prometheus_exporter_resource():
 def render_systemd_config():
     if os.path.exists(NODE_EXPORTER_SERVICE):
         os.remove(NODE_EXPORTER_SERVICE)
-    ctxt = {'port': config('port')}
-    render('node-exporter.service.tmpl', NODE_EXPORTER_SERVICE, context=ctxt)
+    args = []
+    for collector in [
+        'ntp', 'nfs', 'supervisord', 'systemd',
+        'mountstats', 'interrupts', 'bonding'
+    ]:
+        if config('{}-collector'.format(collector)):
+            args.append('--collector.{}'.format(collector))
+
+    ctxt = {
+        'host': config('host'),
+        'port': config('port'),
+        'prometheus_args': ' '.join(args)
+    }
+    render(
+        'prometheus-node-exporter.service.tmpl',
+        NODE_EXPORTER_SERVICE,
+        context=ctxt
+    )
+    render(
+        'prometheus-node-exporter-default.tmpl',
+        NODE_EXPORTER_DEFAULT,
+        context=ctxt
+    )
     set_state('prometheus.node.exporter.systemd.available')
 
 
@@ -51,7 +93,7 @@ def render_systemd_config():
       'prometheus.node.exporter.systemd.available')
 @when_not('prometheus.node.exporter.available')
 def set_prometheus_node_exporter_available():
-    start_restart('node-exporter')
+    start_restart('prometheus-node-exporter')
     open_port(config('port'))
     status_set("active",
                "Node-Exporter Running on port {}".format(config('port')))
@@ -68,19 +110,21 @@ def port_changed():
 
 @when('prometheus.node.exporter.available',
       'endpoint.scrape.available')
-@when_not('prometheus.node.exporter.told_port')
+@when_not('prometheus.node.exporter.configured_port')
 def set_provides_data():
     prometheus = endpoint_from_flag('endpoint.scrape.available')
-    log("Scrape Endpoint became available. Telling port. ({})".format(config('port')))
+    log("Scrape Endpoint became available. Telling port. ({})".format(
+        config('port')
+    ))
     prometheus.configure(port=config('port'))
-    set_state('prometheus.node.exporter.told_port')
+    set_state('prometheus.node.exporter.configured_port')
 
 
 @when_not('endpoint.scrape.available')
-@when('prometheus.node.exporter.told_port')
+@when('prometheus.node.exporter.configured_port')
 def prometheus_left():
     log("Scrape Endpoint became unavailable")
-    clear_flag('prometheus.node.exporter.told_port')
+    clear_flag('prometheus.node.exporter.configured_port')
 
 
 @hook('stop')

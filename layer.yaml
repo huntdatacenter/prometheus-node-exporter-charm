@@ -7,5 +7,5 @@
 "includes":
 - "layer:basic"
 - "interface:prometheus"
-"repo": "https://github.com/talentiq/charms"
+"repo": "https://github.com/CanonicalLtd/prometheus-node-exporter-charm"
 "is": "prometheus-node-exporter"
