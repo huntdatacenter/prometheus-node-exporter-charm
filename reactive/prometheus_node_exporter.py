@@ -102,6 +102,8 @@ def install_prometheus_exporter_resource():
 def render_systemd_config():
     if os.path.exists(NODE_EXPORTER_SERVICE):
         os.remove(NODE_EXPORTER_SERVICE)
+    if os.path.exists(NODE_EXPORTER_DEFAULT):
+        os.remove(NODE_EXPORTER_DEFAULT)
     host = config('host')
     if host in ['public', 'private']:
         host = unit_private_ip() if (host == 'private') else unit_public_ip()
@@ -109,6 +111,7 @@ def render_systemd_config():
         'host': host,
         'port': config('port')
     }
+    render_default_config()
     render(
         'prometheus-node-exporter.service.tmpl',
         NODE_EXPORTER_SERVICE,
