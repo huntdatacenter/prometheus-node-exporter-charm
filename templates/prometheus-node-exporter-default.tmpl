@@ -3,7 +3,7 @@
 # Due to shell scaping, to pass backslashes for regexes, you need to double
 # them (\\d for \d). If running under systemd, you need to double them again
 # (\\\\d to mean \d), and escape newlines too.
-ARGS="--collector.diskstats.ignored-devices=^(ram|loop|fd|nvme\\d+n\\d+p)(\\\\d+$" \
+ARGS="--collector.diskstats.ignored-devices=^(ram|loop|fd|nvme\\\\d+n\\\\d+p)(\\\\d+$" \
      "--collector.textfile.directory=/var/lib/prometheus/node-exporter" \
      "--log.level={% if debug %}debug{% else %}info{% endif %}" {% if collectors %}\{% endif %}
      {% for c in collectors %}"--collector.{{ c }}" {% endfor %}
