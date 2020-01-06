@@ -3,12 +3,17 @@
     "type": "string"
     "default": !!str "0.0.0.0"
     "description": |
-      IP to run metrics target on
+      IP to run metrics target on or set to "public" or "private" for juju to set IP
   "port":
     "type": "int"
     "default": !!int "9100"
     "description": |
-      port to run metrics target on
+      Port to run metrics target on
+  "debug":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Debug log level.
   "ntp-collector":
     "type": "boolean"
     "default": !!bool "false"
@@ -44,3 +49,48 @@
     "default": !!bool "false"
     "description": |
       Enable bonding collector.
+  "megacli-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable megacli collector.
+  "tcpstat-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable tcpstat collector.
+  "runit-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable runit collector.
+  "qdisc-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable qdisc collector.
+  "ksmt-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable ksmt collector.
+  "logind-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable logind collector.
+  "gmond-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable gmond collector.
+  "drbd-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable drbd collector.
+  "buddyinfo-collector":
+    "type": "boolean"
+    "default": !!bool "false"
+    "description": |
+      Enable buddyinfo collector.

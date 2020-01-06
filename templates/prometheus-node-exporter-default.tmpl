@@ -5,7 +5,7 @@
 # (\\\\d to mean \d), and escape newlines too.
 ARGS="--collector.diskstats.ignored-devices=^(ram|loop|fd|nvme\\d+n\\d+p)\\d+$ \
       --collector.textfile.directory=/var/lib/prometheus/node-exporter \
-      --web.listen-address={{ host }}:{{ port }} {% if collectors %}\{% endif %}
+      --web.listen-address={{ host }}:{{ port }}{% if debug %} --log.level=debug{% endif %}{% if collectors %} \{% endif %}
       {% for c in collectors %}--collector.{{ c }} {% endfor %}"
 
 # Prometheus-node-exporter supports the following options:

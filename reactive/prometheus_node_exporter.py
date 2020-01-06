@@ -16,6 +16,8 @@ from charmhelpers.core.hookenv import (
     resource_get,
     status_set,
     open_port,
+    unit_private_ip,
+    unit_public_ip,
     log,
 )
 
@@ -40,15 +42,21 @@ from charms.layer.prometheus_node_exporter import (
 def render_default_config():
     enabled_collectors = []
     for collector in [
-        'ntp', 'nfs', 'supervisord', 'systemd',
-        'mountstats', 'interrupts', 'bonding'
+        'ntp', 'nfs', 'supervisord', 'systemd', 'mountstats', 'interrupts',
+        'bonding', 'megacli', 'tcpstat', 'runit',  'qdisc', 'ksmt', 'logind',
+        'gmond', 'drbd', 'buddyinfo'
     ]:
         if config('{}-collector'.format(collector)):
             enabled_collectors.append(collector)
+    host = config('host')
+    if host in ['public', 'private']:
+        host = unit_private_ip() if (host == 'private') else unit_public_ip()
+
     ctxt = {
-        'host': config('host'),
+        'host': host,
         'port': config('port'),
-        'collectors': enabled_collectors
+        'debug': config('debug'),
+        'collectors': enabled_collectors,
     }
     render(
         'prometheus-node-exporter-default.tmpl',
