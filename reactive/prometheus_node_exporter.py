@@ -36,6 +36,28 @@ from charms.layer.prometheus_node_exporter import (
 )
 
 
+@hook('config-changed')
+def render_default_config():
+    enabled_collectors = []
+    for collector in [
+        'ntp', 'nfs', 'supervisord', 'systemd',
+        'mountstats', 'interrupts', 'bonding'
+    ]:
+        if config('{}-collector'.format(collector)):
+            enabled_collectors.append(collector)
+    ctxt = {
+        'host': config('host'),
+        'port': config('port'),
+        'collectors': enabled_collectors
+    }
+    render(
+        'prometheus-node-exporter-default.tmpl',
+        NODE_EXPORTER_DEFAULT,
+        context=ctxt
+    )
+    start_restart('prometheus-node-exporter')
+
+
 @when_not('prometheus.user.available')
 def create_prometheus_user():
     if not group_exists('prometheus'):
@@ -77,28 +99,9 @@ def install_prometheus_exporter_resource():
 def render_systemd_config():
     if os.path.exists(NODE_EXPORTER_SERVICE):
         os.remove(NODE_EXPORTER_SERVICE)
-    enabled_collectors = []
-    for collector in [
-        'ntp', 'nfs', 'supervisord', 'systemd',
-        'mountstats', 'interrupts', 'bonding'
-    ]:
-        if config('{}-collector'.format(collector)):
-            enabled_collectors.append(collector)
-
-    ctxt = {
-        'host': config('host'),
-        'port': config('port'),
-        'collectors': enabled_collectors
-    }
     render(
         'prometheus-node-exporter.service.tmpl',
-        NODE_EXPORTER_SERVICE,
-        context=ctxt
-    )
-    render(
-        'prometheus-node-exporter-default.tmpl',
-        NODE_EXPORTER_DEFAULT,
-        context=ctxt
+        NODE_EXPORTER_SERVICE
     )
     set_state('prometheus.node.exporter.systemd.available')
 
