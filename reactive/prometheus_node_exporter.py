@@ -18,6 +18,7 @@ from charmhelpers.core.hookenv import (
     open_port,
     log,
 )
+
 from charmhelpers.core.templating import render
 from charmhelpers.core.host import (
     mkdir,
@@ -25,6 +26,7 @@ from charmhelpers.core.host import (
     add_group,
     user_exists,
     adduser,
+    service_stop,
 )
 from charms.layer.prometheus_node_exporter import (
     start_restart,
@@ -34,9 +36,8 @@ from charms.layer.prometheus_node_exporter import (
 )
 
 
-@when_not('prometheus.node.exporter.bin.available')
-def install_prometheus_exporter_resource():
-    go_bin = resource_get('prometheus-node-exporter')
+@when_not('prometheus.user.available')
+def create_prometheus_user():
     if not group_exists('prometheus'):
         add_group('prometheus', system_group=True)
     if not user_exists('prometheus'):
@@ -47,10 +48,22 @@ def install_prometheus_exporter_resource():
             primary_group='prometheus',
             home_dir='/var/lib/prometheus',
         )
+    set_state('prometheus.user.available')
+
+
+@when('prometheus.user.available')
+@when_not('prometheus.dir.available')
+def create_prometheus_directory():
     if not os.path.exists('/var/lib/prometheus'):
         mkdir('/var/lib/prometheus', owner='prometheus')
     if not os.path.exists('/var/lib/prometheus/node-exporter'):
         mkdir('/var/lib/prometheus/node-exporter', owner='prometheus')
+    set_state('prometheus.dir.available')
+
+
+@when_not('prometheus.node.exporter.bin.available')
+def install_prometheus_exporter_resource():
+    go_bin = resource_get('node-exporter')
     if os.path.exists(NODE_EXPORTER_BIN):
         os.remove(NODE_EXPORTER_BIN)
     copyfile(go_bin, NODE_EXPORTER_BIN)
@@ -58,23 +71,24 @@ def install_prometheus_exporter_resource():
     set_state('prometheus.node.exporter.bin.available')
 
 
-@when('prometheus.node.exporter.bin.available')
+@when('prometheus.node.exporter.bin.available',
+      'prometheus.dir.available')
 @when_not('prometheus.node.exporter.systemd.available')
 def render_systemd_config():
     if os.path.exists(NODE_EXPORTER_SERVICE):
         os.remove(NODE_EXPORTER_SERVICE)
-    args = []
+    enabled_collectors = []
     for collector in [
         'ntp', 'nfs', 'supervisord', 'systemd',
         'mountstats', 'interrupts', 'bonding'
     ]:
         if config('{}-collector'.format(collector)):
-            args.append('--collector.{}'.format(collector))
+            enabled_collectors.append(collector)
 
     ctxt = {
         'host': config('host'),
         'port': config('port'),
-        'prometheus_args': ' '.join(args)
+        'collectors': enabled_collectors
     }
     render(
         'prometheus-node-exporter.service.tmpl',
@@ -90,13 +104,15 @@ def render_systemd_config():
 
 
 @when('prometheus.node.exporter.bin.available',
-      'prometheus.node.exporter.systemd.available')
+      'prometheus.node.exporter.systemd.available',
+      'prometheus.dir.available')
 @when_not('prometheus.node.exporter.available')
 def set_prometheus_node_exporter_available():
     start_restart('prometheus-node-exporter')
     open_port(config('port'))
-    status_set("active",
-               "Node-Exporter Running on port {}".format(config('port')))
+    status_set("active", "Prometheus-Node-Exporter Running on port {}".format(
+        config('port')
+    ))
     set_state('prometheus.node.exporter.available')
 
 
@@ -104,7 +120,9 @@ def set_prometheus_node_exporter_available():
       'prometheus.node.exporter.available')
 def port_changed():
     prometheus = endpoint_from_name('scrape')
-    log("Port changed, telling relations. ({})".format(config('port')))
+    log("Port changed, telling relations. ({})".format(
+        config('port')
+    ))
     prometheus.configure(port=config('port'))
 
 
@@ -130,7 +148,7 @@ def prometheus_left():
 @hook('stop')
 def cleanup():
     status_set("maintenance", "cleaning up prometheus-node-exporter")
-    call('service node-exporter stop'.split())
+    service_stop('prometheus-node-exporter')
     for f in [NODE_EXPORTER_BIN, NODE_EXPORTER_SERVICE]:
         call('rm {}'.format(f).split())
     status_set("active", "cleanup complete")
