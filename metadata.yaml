@@ -4,6 +4,7 @@
 "description": |
   This layer provides the prometheus "node_exporter"
 "tags":
+- "monitoring"
 - "prometheus"
 "series":
 - "xenial"

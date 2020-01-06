@@ -48,13 +48,8 @@ def render_default_config():
     ]:
         if config('{}-collector'.format(collector)):
             enabled_collectors.append(collector)
-    host = config('host')
-    if host in ['public', 'private']:
-        host = unit_private_ip() if (host == 'private') else unit_public_ip()
 
     ctxt = {
-        'host': host,
-        'port': config('port'),
         'debug': config('debug'),
         'collectors': enabled_collectors,
     }
@@ -107,9 +102,17 @@ def install_prometheus_exporter_resource():
 def render_systemd_config():
     if os.path.exists(NODE_EXPORTER_SERVICE):
         os.remove(NODE_EXPORTER_SERVICE)
+    host = config('host')
+    if host in ['public', 'private']:
+        host = unit_private_ip() if (host == 'private') else unit_public_ip()
+    ctxt = {
+        'host': host,
+        'port': config('port')
+    }
     render(
         'prometheus-node-exporter.service.tmpl',
-        NODE_EXPORTER_SERVICE
+        NODE_EXPORTER_SERVICE,
+        context=ctxt
     )
     set_state('prometheus.node.exporter.systemd.available')
 
