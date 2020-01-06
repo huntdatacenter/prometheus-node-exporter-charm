@@ -4,9 +4,11 @@
 "description": |
   This layer provides the prometheus "node_exporter"
 "tags":
+- "monitoring"
 - "prometheus"
 "series":
 - "xenial"
+- "bionic"
 "requires":
   "juju-info":
     "interface": "juju-info"
@@ -18,5 +20,5 @@
   "node-exporter":
     "type": "file"
     "filename": "node_exporter"
-    "description": "Prometheus Node Exporter"
+    "description": "Prometheus Node Exporter (https://github.com/prometheus/node_exporter/releases)"
 "subordinate": !!bool "true"
