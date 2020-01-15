@@ -1,0 +1,15 @@
+series: xenial
+applications:
+  prometheus:
+    charm: cs:prometheus
+    num_units: 1
+  prometheus-node-exporter:
+    charm: /tmp/charm-builds/prometheus-node-exporter
+  ubuntu:
+    charm: cs:ubuntu
+    num_units: 1
+relations:
+- - prometheus-node-exporter:juju-info
+  - ubuntu:juju-info
+- - prometheus-node-exporter:scrape
+  - prometheus:scrape

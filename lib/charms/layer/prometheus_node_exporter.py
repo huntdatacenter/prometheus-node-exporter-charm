@@ -1,9 +1,8 @@
 from charmhelpers.core.host import (
     service_restart,
     service_running,
-    service_start,
+    service_start
 )
-
 
 NODE_EXPORTER_BIN = "/usr/bin/prometheus-node-exporter"
 NODE_EXPORTER_SERVICE = "/etc/systemd/system/prometheus-node-exporter.service"

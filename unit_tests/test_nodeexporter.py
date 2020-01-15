@@ -2,11 +2,10 @@ import argparse
 import io
 import os
 
-from charms.layer import basic
 import charms.reactive
-from charms.reactive.helpers import data_changed
-
 from charmhelpers.core import hookenv
+from charms.layer import basic
+from charms.reactive.helpers import data_changed
 from charmtest import CharmTest
 
 
