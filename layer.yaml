@@ -7,6 +7,5 @@
 "includes":
 - "layer:basic"
 - "interface:prometheus"
-- "interface:juju-info"
 "repo": "https://github.com/CanonicalLtd/prometheus-node-exporter-charm"
 "is": "prometheus-node-exporter"
