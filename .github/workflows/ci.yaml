@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: charm
-          path: /tmp/charm-builds/netbox
+          path: /tmp/charm-builds/prometheus-node-exporter
   test:
     runs-on: ubuntu-18.04
     needs: build
@@ -41,9 +41,8 @@ jobs:
           - 2.6/stable
           - 2.7/stable
         test_bundles:
-          - bionic-base
-          - bionic-nrpe
-          - bionic-replica
+          - xenial-bundle
+          - bionic-bundle
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1
@@ -54,17 +53,15 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: charm
-          path: /tmp/charm-builds/netbox
+          path: /tmp/charm-builds/prometheus-node-exporter
       # Workarounds for https://github.com/actions/upload-artifact/issues/38
-      - run: chmod +x -R /tmp/charm-builds/netbox/bin
-      - run: find /tmp/charm-builds/netbox/hooks -maxdepth 1 -type f -exec chmod +x \{\} \;
-      # security.privileged true is required for Docker in LXD in testing
+      - run: chmod +x -R /tmp/charm-builds/prometheus-node-exporter/bin
+      - run: chmod +x -R /tmp/charm-builds/prometheus-node-exporter/hooks
       - name: Set up LXD
         run: |
           sudo usermod --append --groups lxd $(whoami)
           sudo su $(whoami) -c 'lxd init --auto'
           sudo su $(whoami) -c 'lxc network set lxdbr0 ipv6.address none'
-          sudo su $(whoami) -c 'lxc profile set default security.privileged true'
       - name: Change ownership of root workaround for snapcraft
         # See https://forum.snapcraft.io/t/permissions-problem-using-snapcraft-in-azure-pipelines/13258/14?u=szeestraten
         run: sudo chown root:root /
