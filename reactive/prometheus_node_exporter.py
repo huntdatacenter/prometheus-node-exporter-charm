@@ -2,40 +2,33 @@ import os
 from shutil import copyfile
 from subprocess import call
 
-from charms.reactive import (
-    when,
-    hook,
-    when_not,
-    set_state,
-)
-from charms.reactive.relations import endpoint_from_flag, endpoint_from_name
-from charms.reactive.flags import clear_flag
-
 from charmhelpers.core.hookenv import (
     config,
+    log,
+    open_port,
     resource_get,
     status_set,
-    open_port,
     unit_private_ip,
-    unit_public_ip,
-    log,
+    unit_public_ip
 )
-
-from charmhelpers.core.templating import render
 from charmhelpers.core.host import (
-    mkdir,
-    group_exists,
     add_group,
-    user_exists,
     adduser,
+    group_exists,
+    mkdir,
     service_stop,
+    user_exists
 )
+from charmhelpers.core.templating import render
 from charms.layer.prometheus_node_exporter import (
-    start_restart,
     NODE_EXPORTER_BIN,
-    NODE_EXPORTER_SERVICE,
     NODE_EXPORTER_DEFAULT,
+    NODE_EXPORTER_SERVICE,
+    start_restart
 )
+from charms.reactive import hook, set_state, when, when_not
+from charms.reactive.flags import clear_flag
+from charms.reactive.relations import endpoint_from_flag, endpoint_from_name
 
 
 @hook('config-changed')
