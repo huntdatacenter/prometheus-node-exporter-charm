@@ -1,9 +1,7 @@
 series: bionic
 applications:
   prometheus:
-    charm: cs:prometheus
-    # No Bionic charm available
-    series: xenial
+    charm: cs:prometheus2-12
     num_units: 1
   prometheus-node-exporter:
     charm: /tmp/charm-builds/prometheus-node-exporter
