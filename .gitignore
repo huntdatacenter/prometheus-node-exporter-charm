@@ -133,3 +133,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Dev env
+.vagrant
+vagrant.yaml
+Vagrantfile
