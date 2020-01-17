@@ -45,7 +45,7 @@ push: clean build generate-repo-info ## Push charm to stable channel
 	@echo "Publishing $(CHARM_STORE_URL)"
 	@export rev=$$(charm push $(CHARM_PATH) $(CHARM_STORE_URL) 2>&1 \
 		| tee /dev/tty | grep url: | cut -f 2 -d ' ') \
-	&& charm release --channel stable $$rev \
+	&& charm release --resource node-exporter-1 --channel stable $$rev \
 	&& charm grant $$rev --acl read everyone \
 	&& charm set $$rev extra-info=$$(git rev-parse --short HEAD) \
 		bugs-url=$(CHARM_BUGS_URL) homepage=$(CHARM_HOMEPAGE)
