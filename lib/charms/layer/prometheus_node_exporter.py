@@ -1,3 +1,4 @@
+from charmhelpers.core.host import service as service_cmd
 from charmhelpers.core.host import (
     service_restart,
     service_running,
@@ -14,3 +15,11 @@ def start_restart(service):
         service_restart(service)
     else:
         service_start(service)
+
+
+def service_enable(service):
+    service_cmd('enable', service)
+
+
+def service_disable(service):
+    service_cmd('disable', service)
