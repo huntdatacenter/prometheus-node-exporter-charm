@@ -24,6 +24,8 @@ from charms.layer.prometheus_node_exporter import (
     NODE_EXPORTER_BIN,
     NODE_EXPORTER_DEFAULT,
     NODE_EXPORTER_SERVICE,
+    service_disable,
+    service_enable,
     start_restart
 )
 from charms.reactive import hook, set_state, when, when_not
@@ -51,6 +53,7 @@ def render_default_config():
         NODE_EXPORTER_DEFAULT,
         context=ctxt
     )
+    service_enable('prometheus-node-exporter')
     start_restart('prometheus-node-exporter')
 
 
@@ -118,6 +121,7 @@ def render_systemd_config():
       'prometheus.dir.available')
 @when_not('prometheus.node.exporter.available')
 def set_prometheus_node_exporter_available():
+    service_enable('prometheus-node-exporter')
     start_restart('prometheus-node-exporter')
     open_port(config('port'))
     status_set("active", "Prometheus-Node-Exporter Running on port {}".format(
@@ -158,6 +162,7 @@ def prometheus_left():
 @hook('stop')
 def cleanup():
     status_set("maintenance", "cleaning up prometheus-node-exporter")
+    service_disable('prometheus-node-exporter')
     service_stop('prometheus-node-exporter')
     for f in [NODE_EXPORTER_BIN, NODE_EXPORTER_SERVICE]:
         call('rm {}'.format(f).split())

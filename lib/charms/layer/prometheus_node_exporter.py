@@ -14,5 +14,12 @@ def start_restart(service):
     if service_running(service):
         service_restart(service)
     else:
-        service_cmd('enable', service)
         service_start(service)
+
+
+def service_enable(service):
+    service_cmd('enable', service)
+
+
+def service_disable(service):
+    service_cmd('disable', service)
