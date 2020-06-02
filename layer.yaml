@@ -1,9 +1,10 @@
 "options":
   "prometheus-node-exporter": {}
   "basic":
-    "use_venv": !!bool "false"
+    "use_venv": !!bool "true"
     "packages": []
     "include_system_packages": !!bool "false"
+    "python_packages": []
 "includes":
 - "layer:basic"
 - "interface:prometheus"
