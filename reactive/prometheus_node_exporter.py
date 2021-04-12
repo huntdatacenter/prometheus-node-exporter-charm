@@ -38,7 +38,7 @@ def render_default_config():
     enabled_collectors = []
     for collector in [
         'ntp', 'nfs', 'supervisord', 'systemd', 'mountstats', 'interrupts',
-        'bonding', 'megacli', 'tcpstat', 'runit',  'qdisc', 'ksmt', 'logind',
+        'bonding', 'megacli', 'tcpstat', 'runit', 'qdisc', 'ksmt', 'logind',
         'gmond', 'drbd', 'buddyinfo'
     ]:
         if config('{}-collector'.format(collector)):
