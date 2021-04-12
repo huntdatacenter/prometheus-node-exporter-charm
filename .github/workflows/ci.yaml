@@ -37,7 +37,6 @@ jobs:
       fail-fast: false
       matrix:
         juju_channel:
-          - 2.6/stable
           - 2.7/stable
           - 2.8/stable
         test_bundles:
