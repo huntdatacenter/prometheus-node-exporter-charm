@@ -23,12 +23,6 @@ jobs:
         with:
           python-version: '3.7.x'
       - run: pip install tox
-      - run: |
-          wget -O node_exporter.tar.gz \
-            "https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz"
-          tar --extract --file=node_exporter.tar.gz node_exporter-1.1.2.linux-amd64/node_exporter
-          mv node_exporter-1.1.2.linux-amd64/node_exporter /tmp/node_exporter
-          rm -rf node_exporter-1.1.2.linux-amd64 node_exporter.tar.gz
       - name: Build charm
         run: make build
       - name: Upload charm artifact
@@ -73,6 +67,13 @@ jobs:
         run: |
           sudo snap install juju --classic --channel=${{ matrix.juju_channel }}
           sudo su $(whoami) -c 'juju bootstrap localhost --no-gui'
+      - name: Fetch node_exporter
+        run: |
+          wget -O node_exporter.tar.gz \
+            "https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz"
+          tar --extract --file=node_exporter.tar.gz node_exporter-1.1.2.linux-amd64/node_exporter
+          mv node_exporter-1.1.2.linux-amd64/node_exporter /tmp/node_exporter
+          rm -rf node_exporter-1.1.2.linux-amd64 node_exporter.tar.gz
       - name: Run tests
         run: make test-${{ matrix.test_bundles }}
       - name: Display juju debug log on failure
