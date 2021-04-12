@@ -23,6 +23,11 @@ jobs:
         with:
           python-version: '3.7.x'
       - run: pip install tox
+      - run: |
+          wget -O node_exporter.tar.gz "https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz"
+          tar --extract --file=node_exporter.tar.gz node_exporter-1.1.2.linux-amd64/node_exporter
+          mv node_exporter-1.1.2.linux-amd64/node_exporter /tmp/node_exporter
+          rm -rf node_exporter-1.1.2.linux-amd64 node_exporter.tar.gz
       - name: Build charm
         run: make build
       - name: Upload charm artifact
@@ -37,12 +42,13 @@ jobs:
       fail-fast: false
       matrix:
         juju_channel:
-          - 2.5/stable
           - 2.6/stable
           - 2.7/stable
+          - 2.8/stable
         test_bundles:
           - xenial-bundle
           - bionic-bundle
+          - focal-bundle
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-python@v1

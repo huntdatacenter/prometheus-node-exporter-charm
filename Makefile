@@ -41,6 +41,10 @@ test-bionic-bundle: ## Test Bionic bundle
 	tox -e test-bionic
 
 
+test-focal-bundle: ## Test Focal bundle
+	tox -e test-focal
+
+
 push: clean build generate-repo-info ## Push charm to stable channel
 	@echo "Publishing $(CHARM_STORE_URL)"
 	@export rev=$$(charm push $(CHARM_PATH) $(CHARM_STORE_URL) 2>&1 \
